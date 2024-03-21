@@ -1,9 +1,12 @@
 package com.zybooks.diceroller;
 
+import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.ContextMenu;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,6 +17,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GestureDetectorCompat;
 
 public class MainActivity extends AppCompatActivity
         implements RollLengthDialogFragment.OnRollLengthSelectedListener {
@@ -31,7 +35,9 @@ public class MainActivity extends AppCompatActivity
     private ImageView[] mDiceImageViews;
     private int mCurrentDie;
     private int mInitX;
+    private GestureDetectorCompat mDetector;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,12 +60,12 @@ public class MainActivity extends AppCompatActivity
 
         showDice();
         for (int i = 0; i < mDiceImageViews.length; i++) {
-            registerForContextMenu(mDiceImageViews[i]);
+            //registerForContextMenu(mDiceImageViews[i]);
             mDiceImageViews[i].setTag(i);
         }
 
         // Moving finger left or right changes dice number
-        mDiceImageViews[0].setOnTouchListener((v, event) -> {
+        /*mDiceImageViews[0].setOnTouchListener((v, event) -> {
             int action = event.getAction();
             switch(action){
                 case MotionEvent.ACTION_DOWN:
@@ -81,11 +87,13 @@ public class MainActivity extends AppCompatActivity
                     return true;
             }
             return false;
-        });
+        });*/
+
+        mDetector = new GestureDetectorCompat(this, new DiceGestureListener());
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         mCurrentDie = (int) v.getTag();
         MenuInflater inflater = getMenuInflater();
@@ -93,7 +101,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item){
+    public boolean onContextItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.add_one) {
             mDice[mCurrentDie].addOne();
             showDice();
@@ -194,6 +202,34 @@ public class MainActivity extends AppCompatActivity
         // Hide remaining dice
         for (int i = numVisible; i < MAX_DICE; i++) {
             mDiceImageViews[i].setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    private class DiceGestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent event) {
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (velocityY > 0) {
+                rollDice();
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent event){ // only does first die rn
+            mDice[mCurrentDie].addOne();
+            showDice();
+            return true;
         }
     }
 }
