@@ -62,33 +62,32 @@ public class MainActivity extends AppCompatActivity
         for (int i = 0; i < mDiceImageViews.length; i++) {
             //registerForContextMenu(mDiceImageViews[i]);
             mDiceImageViews[i].setTag(i);
-
-            /*
-            // Moving finger left or right changes dice number
-            mDiceImageViews[0].setOnTouchListener((v, event) -> {
-                int action = event.getAction();
-                switch(action){
-                    case MotionEvent.ACTION_DOWN:
-                        mInitX = (int) event.getX();
-                        return true;
-                    case MotionEvent.ACTION_MOVE:
-                        int x = (int) event.getX();
-
-                        // see if movement is at least 20px
-                        if(Math.abs(x - mInitX) >= 20){
-                            if(x > mInitX){
-                                mDice[0].addOne();
-                            }else{
-                                mDice[0].subtractOne();
-                            }
-                            showDice();
-                            mInitX = x;
-                        }
-                        return true;
-                }
-                return false;
-            });*/
         }
+
+        // Moving finger left or right changes dice number
+        /*mDiceImageViews[0].setOnTouchListener((v, event) -> {
+            int action = event.getAction();
+            switch(action){
+                case MotionEvent.ACTION_DOWN:
+                    mInitX = (int) event.getX();
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    int x = (int) event.getX();
+
+                    // see if movement is at least 20px
+                    if(Math.abs(x - mInitX) >= 20){
+                        if(x > mInitX){
+                            mDice[0].addOne();
+                        }else{
+                            mDice[0].subtractOne();
+                        }
+                        showDice();
+                        mInitX = x;
+                    }
+                    return true;
+            }
+            return false;
+        });*/
 
         mDetector = new GestureDetectorCompat(this, new DiceGestureListener());
     }
